@@ -17,9 +17,11 @@ const gameManager = new GameManager();
 
 // BẮT BUỘC: Thêm header bỏ qua màn hình chặn của Localtunnel
 app.use((req, res, next) => {
+  res.setHeader('ngrok-skip-browser-warning', 'true');
   res.setHeader('bypass-tunnel-reminder', 'true');
   next();
 });
+// KẾT THÚC ĐOẠN CẦN THÊM
 
 const rootDir = path.join(__dirname, '..');
 app.use(express.static(rootDir));

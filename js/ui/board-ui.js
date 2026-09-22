@@ -33,6 +33,12 @@ export class BoardUI {
   }
 
   render(board) {
+    const pieceImages = {
+      ROCK: 'assets/pieces/rock.png',
+      SCISSORS: 'assets/pieces/scissors.png',
+      PAPER: 'assets/pieces/paper.png'
+    };
+
     for (let r = 0; r < 9; r++) {
       for (let c = 0; c < 9; c++) {
         const cellEl = this.cells[r][c];
@@ -42,7 +48,11 @@ export class BoardUI {
         if (piece) {
           const pieceEl = document.createElement('div');
           pieceEl.classList.add('piece', piece.owner.toLowerCase());
-          pieceEl.textContent = piece.getSymbol();
+          const imageEl = document.createElement('img');
+          imageEl.src = pieceImages[piece.type];
+          imageEl.alt = `${piece.owner} ${piece.type.toLowerCase()}`;
+          imageEl.draggable = false;
+          pieceEl.appendChild(imageEl);
           cellEl.appendChild(pieceEl);
         }
       }

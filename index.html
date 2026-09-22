@@ -14,6 +14,17 @@
   </header>
 
   <main class="game-container">
+    <section id="start-menu" class="start-menu">
+      <div class="menu-mark">OTTv2</div>
+      <h2>Chọn chế độ chơi</h2>
+      <p>Đưa quân về ô đích hoặc tiêu diệt một loại quân của đối thủ.</p>
+      <div class="mode-actions">
+        <button id="btn-vs-computer" class="mode-button primary">Chơi với máy</button>
+        <button id="btn-vs-player" class="mode-button">Hai người chơi</button>
+      </div>
+    </section>
+
+    <section id="game-screen" class="game-screen hidden">
     <!-- Bảng điểm & Số quân -->
     <div class="scoreboard">
       <div id="p1-panel" class="player-panel p1">
@@ -34,8 +45,12 @@
     <!-- Thanh trạng thái và nút Chơi lại -->
     <div class="status-bar">
       <div id="status-text">Lượt đi: Player 1</div>
-      <button id="btn-restart" class="btn-restart">Chơi lại</button>
+      <div class="status-actions">
+        <button id="btn-menu" class="btn-secondary">Menu</button>
+        <button id="btn-restart" class="btn-restart">Chơi lại</button>
+      </div>
     </div>
+    </section>
   </main>
 
   <script type="module" src="js/main.js"></script>

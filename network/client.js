@@ -44,17 +44,20 @@ function updateUI() {
 const boardUI = new BoardUI(boardEl, handleCellClick);
 updateUI();
 
-// 4. Kết nối Socket.IO với cấu hình tương thích Localtunnel
+// 4. Kết nối Socket.IO với cấu hình tương thích ngrok
 let socket = null;
 if (typeof io !== 'undefined') {
   socket = io({
-    transports: ['websocket'], // Bỏ qua polling để tránh bị lỗi 403/cors từ tunnel
+    transports: ['polling', 'websocket'], // Bật cả polling để ngrok không bị ngắt quãng
     extraHeaders: {
+      'ngrok-skip-browser-warning': 'true',
       'bypass-tunnel-reminder': 'true'
     }
   });
 
   socket.emit('join_room', roomId);
+  
+  // ... (giữ nguyên các phần socket.on bên dưới)
 
   socket.on('player_assigned', ({ role }) => {
     myRole = role;
