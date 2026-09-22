@@ -1,6 +1,16 @@
 {
+  "name": "ottv2-multiplayer",
+  "version": "1.0.0",
+  "description": "Game Oẳn Tù Tì v2 Multiplayer",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js"
+  },
   "dependencies": {
-    "express": "^5.2.1",
-    "socket.io": "^4.8.3"
+    "express": "^4.19.0",
+    "socket.io": "^4.7.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
