@@ -43,6 +43,8 @@ export class Board {
 
   // Khởi tạo vị trí 9 quân ban đầu cho cả 2 bên
   setupInitialPieces() {
+    this.grid = Array(this.size).fill(null).map(() => Array(this.size).fill(null));
+
     const pool = [
       PieceType.ROCK, PieceType.ROCK, PieceType.ROCK,
       PieceType.SCISSORS, PieceType.SCISSORS, PieceType.SCISSORS,

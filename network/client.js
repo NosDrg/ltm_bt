@@ -1,63 +1,47 @@
 import { Game } from '../game/game.js';
 import { BoardUI } from '../ui/board-ui.js';
 import { MessageUI } from '../ui/message-ui.js';
-import { RoomManager } from './room.js';
 
-// 1. Tạo Room ID ngay từ đầu
-const roomId = RoomManager.getRoomId();
 const game = new Game();
 
-// 2. Lấy các phần tử DOM
+// -- DOM LOBBY --
+const lobbyContainer = document.getElementById('lobby-container');
+const gameContainer = document.getElementById('game-container');
+const btnCreateRoom = document.getElementById('btn-create-room');
+const btnJoinRoom = document.getElementById('btn-join-room');
+const inputRoomCode = document.getElementById('input-room-code');
+
+// -- DOM GAME --
 const boardEl = document.getElementById('board');
 const statusEl = document.getElementById('status-text');
 const p1ScoreEl = document.getElementById('p1-score');
 const p2ScoreEl = document.getElementById('p2-score');
 const p1PanelEl = document.getElementById('p1-panel');
 const p2PanelEl = document.getElementById('p2-panel');
-const btnRestart = document.getElementById('btn-restart');
-const roomLinkInput = document.getElementById('room-link');
+const btnRestartGame = document.getElementById('btn-restart');
+const displayRoomCode = document.getElementById('display-room-code');
 const btnCopy = document.getElementById('btn-copy');
-
-if (roomLinkInput) {
-  roomLinkInput.value = window.location.href;
-}
 
 const messageUI = new MessageUI(statusEl, p1ScoreEl, p2ScoreEl, p1PanelEl, p2PanelEl);
 
 let myRole = null;
 let selectedPos = null;
 let validMoves = [];
+let currentRoomId = null;
 
-function updateUI() {
-  boardUI.render(game.board);
-  messageUI.updateTurn(game.currentTurn);
-  messageUI.updatePieceCounts(
-    game.players.P1.pieceCounts,
-    game.players.P2.pieceCounts
-  );
-  if (game.isGameOver && game.winnerInfo) {
-    messageUI.showGameOver(game.winnerInfo);
-  }
-}
-
-// 3. Khởi tạo bàn cờ hiển thị ngay lập tức
+// Khởi tạo bàn cờ mặc định
 const boardUI = new BoardUI(boardEl, handleCellClick);
-updateUI();
 
-// 4. Kết nối Socket.IO với cấu hình tương thích ngrok
+// KẾT NỐI SOCKET
 let socket = null;
 if (typeof io !== 'undefined') {
   socket = io({
-    transports: ['polling', 'websocket'], // Bật cả polling để ngrok không bị ngắt quãng
+    transports: ['polling', 'websocket'],
     extraHeaders: {
       'ngrok-skip-browser-warning': 'true',
       'bypass-tunnel-reminder': 'true'
     }
   });
-
-  socket.emit('join_room', roomId);
-  
-  // ... (giữ nguyên các phần socket.on bên dưới)
 
   socket.on('player_assigned', ({ role }) => {
     myRole = role;
@@ -76,13 +60,48 @@ if (typeof io !== 'undefined') {
   socket.on('player_left', ({ role }) => {
     messageUI.setMessage(`Người chơi ${role} đã rời phòng.`);
   });
-} else {
-  console.error("Không tìm thấy thư viện Socket.IO!");
+}
+
+// -- XỬ LÝ LOBBY (Tạo & Vào phòng) --
+function enterGame(roomId) {
+  currentRoomId = roomId;
+  displayRoomCode.value = roomId;
+  
+  // Ẩn sảnh, hiện game
+  lobbyContainer.style.display = 'none';
+  gameContainer.style.display = 'flex';
+  
+  // Báo cho server biết mình vào phòng
+  if (socket) socket.emit('join_room', roomId);
+  updateUI();
+}
+
+btnCreateRoom.addEventListener('click', () => {
+  const newId = 'ott_' + Math.random().toString(36).substring(2, 8);
+  enterGame(newId);
+});
+
+btnJoinRoom.addEventListener('click', () => {
+  const roomCode = inputRoomCode.value.trim();
+  if (roomCode.length < 3) {
+    alert("Vui lòng nhập đúng mã phòng!");
+    return;
+  }
+  enterGame(roomCode);
+});
+
+// -- LOGIC GAME --
+function updateUI() {
+  boardUI.render(game.board);
+  messageUI.updateTurn(game.currentTurn);
+  messageUI.updatePieceCounts(game.players.P1.pieceCounts, game.players.P2.pieceCounts);
+  if (game.isGameOver && game.winnerInfo) {
+    messageUI.showGameOver(game.winnerInfo);
+  }
 }
 
 function handleCellClick(r, c) {
   if (game.isGameOver) return;
-
   if (myRole && game.currentTurn !== myRole) {
     messageUI.setMessage('Chưa tới lượt của bạn!');
     return;
@@ -92,22 +111,15 @@ function handleCellClick(r, c) {
 
   if (selectedPos) {
     const isTargetMove = validMoves.some(m => m.r === r && m.c === c);
-
     if (isTargetMove) {
       const moveRes = game.move(selectedPos.r, selectedPos.c, r, c);
       selectedPos = null;
       validMoves = [];
       boardUI.clearHighlights();
-
       updateUI();
 
-      if (socket) {
-        socket.emit('send_move', game.serializeState());
-      }
-
-      if (moveRes.isGameOver) {
-        messageUI.showGameOver(moveRes.winnerInfo);
-      }
+      if (socket) socket.emit('send_move', game.serializeState());
+      if (moveRes.isGameOver) messageUI.showGameOver(moveRes.winnerInfo);
       return;
     }
   }
@@ -115,7 +127,6 @@ function handleCellClick(r, c) {
   if (clickedPiece && clickedPiece.owner === game.currentTurn) {
     selectedPos = { r, c };
     validMoves = game.getValidMovesFor(r, c);
-
     boardUI.clearHighlights();
     boardUI.highlightSelected(r, c);
     boardUI.highlightValidMoves(validMoves);
@@ -127,24 +138,19 @@ function handleCellClick(r, c) {
   boardUI.clearHighlights();
 }
 
-btnRestart?.addEventListener('click', () => {
+btnRestartGame.addEventListener('click', () => {
   game.init();
   selectedPos = null;
   validMoves = [];
   boardUI.clearHighlights();
   updateUI();
-  if (socket) {
-    socket.emit('restart_game', game.serializeState());
-  }
+  if (socket) socket.emit('restart_game', game.serializeState());
 });
 
-// Nút sao chép link tương thích mọi trình duyệt
-if (btnCopy && roomLinkInput) {
-  btnCopy.addEventListener('click', () => {
-    roomLinkInput.value = window.location.href;
-    roomLinkInput.select();
-    document.execCommand('copy');
-    btnCopy.textContent = 'Đã chép!';
-    setTimeout(() => { btnCopy.textContent = 'Sao chép link'; }, 2000);
-  });
-}
+btnCopy.addEventListener('click', () => {
+  displayRoomCode.select();
+  document.execCommand('copy');
+  const oldText = btnCopy.textContent;
+  btnCopy.textContent = 'Đã chép!';
+  setTimeout(() => { btnCopy.textContent = oldText; }, 2000);
+});

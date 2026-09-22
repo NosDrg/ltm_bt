@@ -6,6 +6,9 @@ import { ComputerPlayer } from './game/computer-player.js';
 document.addEventListener('DOMContentLoaded', () => {
   const game = new Game();
   const computerPlayer = new ComputerPlayer('P2');
+  const audioSettings = {
+    maxDurationMs: 3000
+  };
 
   const sounds = {
     ROCK: new Audio('assets/pieces/stone.mp3'),
@@ -14,9 +17,24 @@ document.addEventListener('DOMContentLoaded', () => {
     WIN: new Audio('assets/pieces/winners.mp3')
   };
 
+  let soundStopTimer = null;
+
   function playSound(sound) {
-    sound.currentTime = 0;
+    clearTimeout(soundStopTimer);
+
+    Object.values(sounds).forEach(otherSound => {
+      otherSound.pause();
+      otherSound.currentTime = 0;
+      otherSound.muted = otherSound !== sound;
+    });
+
+    sound.muted = false;
     sound.play().catch(() => {});
+    soundStopTimer = setTimeout(() => {
+      sound.pause();
+      sound.currentTime = 0;
+      sound.muted = true;
+    }, audioSettings.maxDurationMs);
   }
 
   const boardEl = document.getElementById('board');
