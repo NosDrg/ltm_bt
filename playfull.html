@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTTv2 - Multiplayer Server</title>
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- Nạp Socket.IO từ CDN thay vì từ local để tránh bị tunnel chặn -->
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Oẳn Tù Tì v2 (Multiplayer Server)</h1>
+    <p>Chơi 2 người thời gian thực qua Server Node.js</p>
+  </header>
+
+  <main class="game-container">
+    <div style="display: flex; gap: 8px; width: 540px; margin-bottom: 4px;">
+      <input type="text" id="room-link" readonly style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #1e293b; color: #fff;">
+      <button id="btn-copy" class="btn-restart" style="background-color: #059669;">Sao chép link</button>
+    </div>
+
+    <div class="scoreboard">
+      <div id="p1-panel" class="player-panel p1">
+        <span class="name">Player 1 (Hàng 1 → Đích i9)</span>
+        <span id="p1-score" class="piece-counts">👊 3 | ✌️ 3 | ✋ 3</span>
+      </div>
+      <div id="p2-panel" class="player-panel p2">
+        <span class="name">Player 2 (Hàng 9 → Đích a1)</span>
+        <span id="p2-score" class="piece-counts">👊 3 | ✌️ 3 | ✋ 3</span>
+      </div>
+    </div>
+
+    <div class="board-wrapper">
+      <div id="board" class="board"></div>
+    </div>
+
+    <div class="status-bar">
+      <div id="status-text">Đang kết nối...</div>
+      <button id="btn-restart" class="btn-restart">Ván mới</button>
+    </div>
+  </main>
+
+  <script type="module" src="js/network/client.js"></script>
+</body>
+</html>

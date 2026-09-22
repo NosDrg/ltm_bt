@@ -1,0 +1,205 @@
+:root {
+  --bg-color: #0f172a;
+  --surface-color: #1e293b;
+  --board-bg: #334155;
+  --cell-light: #f8fafc;
+  --cell-dark: #cbd5e1;
+  --p1-color: #3b82f6; /* Xanh dương */
+  --p2-color: #ef4444; /* Đỏ */
+  --highlight-move: #86efac;
+  --highlight-attack: #fca5a5;
+  --highlight-suicide: #fdba74;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+header h1 {
+  font-size: 2rem;
+  margin-bottom: 6px;
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Bảng thông tin người chơi */
+.scoreboard {
+  display: flex;
+  justify-content: space-between;
+  width: 540px;
+  background-color: var(--surface-color);
+  padding: 12px 20px;
+  border-radius: 8px;
+}
+
+.player-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.player-panel.active {
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.player-panel.p1 .name { color: var(--p1-color); font-weight: bold; }
+.player-panel.p2 .name { color: var(--p2-color); font-weight: bold; }
+
+.piece-counts {
+  display: flex;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+/* Bàn cờ 9x9 */
+.board-wrapper {
+  position: relative;
+  background-color: var(--board-bg);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(9, 56px);
+  grid-template-rows: repeat(9, 56px);
+  gap: 2px;
+  background-color: #64748b;
+  border: 2px solid #475569;
+}
+
+.cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  cursor: pointer;
+  background-color: var(--cell-light);
+  transition: background-color 0.15s ease;
+}
+
+.cell.dark {
+  background-color: var(--cell-dark);
+}
+
+.cell.selected {
+  outline: 3px solid #eab308;
+  z-index: 2;
+}
+
+/* Ô mục tiêu đích */
+.cell.goal-p1::after {
+  content: "ĐÍCH P1";
+  position: absolute;
+  font-size: 9px;
+  bottom: 2px;
+  color: var(--p1-color);
+  font-weight: bold;
+}
+
+.cell.goal-p2::after {
+  content: "ĐÍCH P2";
+  position: absolute;
+  font-size: 9px;
+  top: 2px;
+  color: var(--p2-color);
+  font-weight: bold;
+}
+
+/* Đánh dấu nước đi hợp lệ */
+.cell.valid-move::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: #22c55e;
+  opacity: 0.7;
+}
+
+.cell.valid-attack {
+  background-color: var(--highlight-attack) !important;
+}
+
+.cell.valid-suicide {
+  background-color: var(--highlight-suicide) !important;
+}
+
+/* Quân cờ */
+.piece {
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  transition: transform 0.1s ease;
+}
+
+.piece:hover {
+  transform: scale(1.1);
+}
+
+.piece.p1 {
+  background: radial-gradient(circle, #60a5fa 30%, #2563eb 100%);
+  border: 2px solid #bfdbfe;
+}
+
+.piece.p2 {
+  background: radial-gradient(circle, #f87171 30%, #dc2626 100%);
+  border: 2px solid #fecaca;
+}
+
+/* Thanh thông báo và Nút điều khiển */
+.status-bar {
+  width: 540px;
+  background-color: var(--surface-color);
+  padding: 10px 16px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+}
+
+.btn-restart {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-restart:hover {
+  background-color: #2563eb;
+}
